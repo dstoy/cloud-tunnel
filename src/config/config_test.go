@@ -65,51 +65,29 @@ func TestParseError(t *testing.T) {
 	assert.Nil(t, config)
 }
 
-func TestMissingInstance(t *testing.T) {
-	instance = nil
-
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("The code did not panic")
-		}
-	}()
-
-	Instance()
-}
-
-func TestExistingInstance(t *testing.T) {
-	instance = &Config{}
-
+func TestGetInstance(t *testing.T) {
 	var config = Instance()
-	assert.NotNil(t, config)
+	assert.Equal(t, config, instance)
 }
 
 func TestLoadDefaultConfig(t *testing.T) {
 	mockReader := new(mocks.MockReader)
 	mockReader.On("ReadFile", mock.Anything).Return("", nil)
 
-	instance = nil
 	reader = mockReader
-
-	assert.Nil(t, instance)
 
 	// load default configuration
 	Load()
 	mockReader.AssertCalled(t, "ReadFile", CONFIG)
-	assert.NotNil(t, instance)
 }
 
 func TestLoadCustomConfig(t *testing.T) {
 	mockReader := new(mocks.MockReader)
 	mockReader.On("ReadFile", mock.Anything).Return("", nil)
 
-	instance = nil
 	reader = mockReader
-
-	assert.Nil(t, instance)
 
 	// load default configuration
 	Load("custom.yaml")
 	mockReader.AssertCalled(t, "ReadFile", "custom.yaml")
-	assert.NotNil(t, instance)
 }

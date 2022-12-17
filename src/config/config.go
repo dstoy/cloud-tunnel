@@ -28,7 +28,7 @@ type ConfigData struct {
 
 var lock = &sync.Mutex{}
 var reader ConfigReader = &FileReader{}
-var instance *Config
+var instance = &Config{}
 
 const CONFIG = "/etc/tunnel.yml"
 
@@ -36,31 +36,30 @@ const CONFIG = "/etc/tunnel.yml"
  * Load a configuration file and initialize the Config singleton
  */
 func Load(file ...string) error {
-	if instance == nil {
-		lock.Lock()
-		defer lock.Unlock()
+	lock.Lock()
+	defer lock.Unlock()
 
-		var path = CONFIG
-		if len(file) > 0 && file[0] != "" {
-			path = file[0]
-		}
-
-		log.Println("Loading application configuration:", path)
-
-		// Read the config file yaml
-		yaml, err := reader.ReadFile(path)
-		if err != nil {
-			return fmt.Errorf("Error loading configuration: %s", err)
-		}
-
-		// Populate the config object
-		config, err := parse(yaml)
-		if err != nil {
-			return fmt.Errorf("Error parsing configuration: %s", err)
-		}
-
-		instance = config
+	var path = CONFIG
+	if len(file) > 0 && file[0] != "" {
+		path = file[0]
 	}
+
+	log.Println("Loading application configuration:", path)
+
+	// Read the config file yaml
+	yaml, err := reader.ReadFile(path)
+	if err != nil {
+		return fmt.Errorf("Error loading configuration: %s", err)
+	}
+
+	// Populate the config object
+	config, err := parse(yaml)
+	if err != nil {
+		return fmt.Errorf("Error parsing configuration: %s", err)
+	}
+
+	instance.Queue = config.Queue
+	instance.Triggers = config.Triggers
 
 	return nil
 }
@@ -95,10 +94,6 @@ func parse(content []byte) (*Config, error) {
 /*
  * Return the configuration instance
  */
-func Instance() Config {
-	if instance == nil {
-		panic("Configuration used before initialized")
-	}
-
-	return *instance
+func Instance() *Config {
+	return instance
 }
