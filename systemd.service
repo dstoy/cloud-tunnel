@@ -1,0 +1,14 @@
+[Unit]
+Description=Cloud tunnel event listener
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/cloud-tunnel >>/var/log/cloud-tunnel.log 2>&1
+Type=simple
+Restart=always
+KillMode=process
+StandardOutput=append:/var/log/cloud-tunnel.log
+StandardError=append:/var/log/cloud-tunnel.log
+
+[Install]
+WantedBy=default.target
