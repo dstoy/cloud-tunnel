@@ -13,14 +13,24 @@ type Trigger struct {
 	Command string
 }
 
+type QueueConfig struct {
+	Url    string
+	Region string
+	KeyId  string
+	Secret string
+}
+
 type Config struct {
-	Queue    string
+	Queue    QueueConfig
 	Triggers []Trigger
 }
 
 type ConfigData struct {
 	Queue struct {
-		Url string
+		Url    string
+		Region string
+		KeyId  string `yaml:"keyId"`
+		Secret string
 	}
 
 	Triggers []map[string]string
@@ -30,7 +40,7 @@ var lock = &sync.Mutex{}
 var reader ConfigReader = &FileReader{}
 var instance = &Config{}
 
-const CONFIG = "/etc/tunnel.yml"
+const CONFIG = "/etc/cloud-tunnel.yaml"
 
 /*
  * Load a configuration file and initialize the Config singleton
@@ -76,7 +86,7 @@ func parse(content []byte) (*Config, error) {
 
 	// Populate the config object
 	var config = &Config{}
-	config.Queue = data.Queue.Url
+	config.Queue = QueueConfig(data.Queue)
 	config.Triggers = make([]Trigger, 0)
 
 	for _, trigger := range data.Triggers {

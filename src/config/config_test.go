@@ -11,11 +11,13 @@ import (
 func TestParse(t *testing.T) {
 	config, err := parse([]byte(
 		"queue:\n" +
-			"    url: url\n",
+			"    url: url\n" +
+			"    region: us-east-1\n",
 	))
 
 	assert.Nil(t, err)
-	assert.Equal(t, config.Queue, "url")
+	assert.Equal(t, config.Queue.Url, "url")
+	assert.Equal(t, config.Queue.Region, "us-east-1")
 	assert.Equal(t, len(config.Triggers), 0)
 }
 
@@ -28,7 +30,7 @@ func TestParseSingleTrigger(t *testing.T) {
 	))
 
 	assert.Nil(t, err)
-	assert.Equal(t, config.Queue, "url")
+	assert.Equal(t, config.Queue.Url, "url")
 	assert.Equal(t, len(config.Triggers), 1)
 
 	var trigger = config.Triggers[0]
@@ -46,7 +48,7 @@ func TestParseMultipleTriggers(t *testing.T) {
 	))
 
 	assert.Nil(t, err)
-	assert.Equal(t, config.Queue, "url")
+	assert.Equal(t, config.Queue.Url, "url")
 	assert.Equal(t, len(config.Triggers), 2)
 
 	var trigger = config.Triggers[0]

@@ -6,8 +6,10 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
+	"github.com/dstoy/tunnel/src/config"
 )
 
 type SQS struct {
@@ -18,14 +20,15 @@ type SQS struct {
 /**
 * Initialize the SQS queue
  */
-func (this *SQS) Connect(queue *string) error {
+func (this *SQS) Connect(queueConfig *config.QueueConfig) error {
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		Config:            this.getConfig(queueConfig),
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 
 	this.svc = sqs.New(sess)
 
-	url, err := this.getQueueUrl(queue)
+	url, err := this.getQueueUrl(&queueConfig.Url)
 	if err != nil {
 		return err
 	}
@@ -34,6 +37,29 @@ func (this *SQS) Connect(queue *string) error {
 	log.Println("Listening for events on queue:", *this.url)
 
 	return nil
+}
+
+/**
+ * Build the AWS credentials
+ */
+func (this *SQS) getConfig(queue *config.QueueConfig) aws.Config {
+	var config = &aws.Config{}
+
+	if queue.Region != "" {
+		config = config.WithRegion(queue.Region)
+	}
+
+	if queue.KeyId != "" && queue.Secret != "" {
+		creds := credentials.NewStaticCredentials(
+			queue.KeyId,
+			queue.Secret,
+			"",
+		)
+
+		config = config.WithCredentials(creds)
+	}
+
+	return *config
 }
 
 /**

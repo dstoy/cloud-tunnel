@@ -13,7 +13,7 @@ type Message struct {
 }
 
 type Queue interface {
-	Connect(*string) error
+	Connect(*config.QueueConfig) error
 	GetMessage() *Message
 	DeleteMessage(*Message) error
 }

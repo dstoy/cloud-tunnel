@@ -9,7 +9,9 @@ import (
 
 func TestGetCommand(t *testing.T) {
 	conf = &config.Config{
-		Queue: "test",
+		Queue: config.QueueConfig{
+			Url: "test",
+		},
 		Triggers: []config.Trigger{
 			{Event: "event", Command: "command"},
 		},
