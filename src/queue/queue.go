@@ -36,7 +36,7 @@ func Listen() error {
 		cmd := getCommand(message.Event)
 		log.Println("Received event:", message.Event)
 
-		if cmd != "" {
+		if cmd != nil {
 			command.Dispatch(cmd)
 		} else {
 			log.Println(
@@ -55,12 +55,16 @@ func Listen() error {
 /**
 * Return the command for a supplied event
  */
-func getCommand(event string) string {
+func getCommand(event string) *command.Command {
 	for i := 0; i < len(conf.Triggers); i++ {
-		if conf.Triggers[i].Event == event {
-			return conf.Triggers[i].Command
+		trigger := conf.Triggers[i]
+		if trigger.Event == event {
+			return &command.Command{
+				Run:  trigger.Run,
+				User: trigger.User,
+			}
 		}
 	}
 
-	return ""
+	return nil
 }

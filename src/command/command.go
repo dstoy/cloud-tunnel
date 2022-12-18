@@ -8,15 +8,26 @@ import (
 type Logger struct {
 }
 
+type Command struct {
+	Run  string
+	User string
+}
+
 var logger = &Logger{}
 
 /**
 * Start executing a command
  */
-func Dispatch(action string) error {
-	log.Println("Executing", action)
+func Dispatch(command *Command) error {
+	log.Println("Executing", command.Run)
 
-	cmd := exec.Command("bash", "-c", action)
+	var cmd *exec.Cmd
+	if command.User != "" {
+		cmd = exec.Command("sudo", "-u", command.User, "bash", "-c", command.Run)
+	} else {
+		cmd = exec.Command("bash", "-c", command.Run)
+	}
+
 	cmd.Stdout = logger
 	cmd.Stderr = logger
 

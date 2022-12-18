@@ -13,7 +13,7 @@ func TestGetCommand(t *testing.T) {
 			Url: "test",
 		},
 		Triggers: []config.Trigger{
-			{Event: "event", Command: "command"},
+			{Event: "event", Run: "command"},
 		},
 	}
 

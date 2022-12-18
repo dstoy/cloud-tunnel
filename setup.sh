@@ -2,7 +2,7 @@
 
 set -e
 
-app_url="https://github.com/dstoy/cloud-tunnel/raw/master/bin/tunnel"
+app_url="https://raw.githubusercontent.com/dstoy/cloud-tunnel/master/bin/tunnel"
 app_path="/bin/cloud-tunnel"
 
 service_url="https://raw.githubusercontent.com/dstoy/cloud-tunnel/master/systemd.service"
@@ -18,16 +18,14 @@ if ! systemctl --version &>/dev/null; then
 fi
 
 # download the app
-if [ ! -e "$app_path" ]; then
-    echo " -> Downloading the application from: $app_url"
-    curl -s --show-error -o "$app_path" "$app_url" || {
-        echo "Error saving the application to: $app_path"
-        exit 1
-    }
+echo " -> Downloading the application from: $app_url"
+curl -s --show-error -o "$app_path" "$app_url" || {
+    echo "Error saving the application to: $app_path"
+    exit 1
+}
 
-    echo " -> Saving application to: $app_path"
-    chmod +x $app_path
-fi
+echo " -> Saving application to: $app_path"
+chmod +x $app_path
 
 # copy the systemd service file
 if [ ! -e "$service_file" ]; then
@@ -52,7 +50,8 @@ queue:
 
 # list of triggers to map events to commands which will be executed
 triggers:
-  - event: echo "triggered event"
+  - event:
+	command: echo "triggered event"
 EOF
 fi
 

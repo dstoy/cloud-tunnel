@@ -9,8 +9,9 @@ import (
 )
 
 type Trigger struct {
-	Event   string
-	Command string
+	Event string
+	Run   string
+	User  string
 }
 
 type QueueConfig struct {
@@ -33,7 +34,10 @@ type ConfigData struct {
 		Secret string
 	}
 
-	Triggers []map[string]string
+	Triggers []map[string]struct {
+		Run  string
+		User string
+	}
 }
 
 var lock = &sync.Mutex{}
@@ -92,8 +96,9 @@ func parse(content []byte) (*Config, error) {
 	for _, trigger := range data.Triggers {
 		for event, command := range trigger {
 			config.Triggers = append(config.Triggers, Trigger{
-				Event:   event,
-				Command: command,
+				Event: event,
+				Run:   command.Run,
+				User:  command.User,
 			})
 		}
 	}

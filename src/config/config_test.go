@@ -26,7 +26,9 @@ func TestParseSingleTrigger(t *testing.T) {
 		"queue:\n" +
 			"    url: url\n" +
 			"triggers: \n" +
-			"    - event: command\n",
+			"    - event: \n" +
+			"          run: command\n" +
+			"          user: user\n",
 	))
 
 	assert.Nil(t, err)
@@ -35,7 +37,8 @@ func TestParseSingleTrigger(t *testing.T) {
 
 	var trigger = config.Triggers[0]
 	assert.Equal(t, trigger.Event, "event")
-	assert.Equal(t, trigger.Command, "command")
+	assert.Equal(t, trigger.Run, "command")
+	assert.Equal(t, trigger.User, "user")
 }
 
 func TestParseMultipleTriggers(t *testing.T) {
@@ -43,8 +46,10 @@ func TestParseMultipleTriggers(t *testing.T) {
 		"queue:\n" +
 			"    url: url\n" +
 			"triggers: \n" +
-			"    - event1: command1\n" +
-			"    - event2: command2\n",
+			"    - event1: \n" +
+			"          run: command1\n" +
+			"    - event2: \n" +
+			"          run: command2\n",
 	))
 
 	assert.Nil(t, err)
@@ -53,11 +58,11 @@ func TestParseMultipleTriggers(t *testing.T) {
 
 	var trigger = config.Triggers[0]
 	assert.Equal(t, trigger.Event, "event1")
-	assert.Equal(t, trigger.Command, "command1")
+	assert.Equal(t, trigger.Run, "command1")
 
 	trigger = config.Triggers[1]
 	assert.Equal(t, trigger.Event, "event2")
-	assert.Equal(t, trigger.Command, "command2")
+	assert.Equal(t, trigger.Run, "command2")
 }
 
 func TestParseError(t *testing.T) {
